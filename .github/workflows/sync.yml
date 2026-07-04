@@ -1,0 +1,73 @@
+name: Sync geungogma translations
+
+on:
+  schedule:
+    - cron: '0 3 * * *'   # 매일 오전 3시 (UTC) 자동 실행
+  workflow_dispatch:        # 수동 실행 버튼
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download latest enGB.json from geungogma
+        run: |
+          curl -L -f -o enGB_latest.json \
+            "https://github.com/geungogma/RogueTrader-KoreanPatch/releases/latest/download/enGB.json" \
+            || (echo "다운로드 실패 — v1.0.0 시도" && \
+                curl -L -f -o enGB_latest.json \
+                "https://github.com/geungogma/RogueTrader-KoreanPatch/releases/download/v1.0.0/enGB.json")
+          echo "다운로드 완료: $(wc -c < enGB_latest.json) bytes"
+
+      - name: Regenerate translations.json
+        id: check
+        run: |
+          output=$(python3 scripts/regenerate.py enGB_latest.json docs)
+          echo "$output"
+          if echo "$output" | grep -q "CHANGED=true"; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push if changed
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/translations.json docs/source_hash.txt
+          git commit -m "Auto-sync: geungogma 최신 번역 반영 [$(date -u '+%Y-%m-%d')]"
+          git push
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './docs'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
