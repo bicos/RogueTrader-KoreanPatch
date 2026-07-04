@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WH40K: Rogue Trader — 한국어 번역 뷰어</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #0e0e14; color: #d4c9a8; min-height: 100vh; }
+  header {
+    background: linear-gradient(135deg, #1a0a00 0%, #2d1500 50%, #1a0a00 100%);
+    border-bottom: 2px solid #8b6914; padding: 16px 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .skull { font-size: 2rem; }
+  header h1 { font-size: 1.2rem; color: #d4a843; letter-spacing: 1px; }
+  header .subtitle { font-size: 0.78rem; color: #8a7a5a; margin-top: 3px; }
+  header .links { margin-left: auto; display: flex; gap: 10px; }
+  header a {
+    font-size: 0.8rem; color: #8b6914; text-decoration: none;
+    border: 1px solid #3a2a10; padding: 5px 12px; border-radius: 4px; transition: all 0.15s;
+  }
+  header a:hover { color: #d4a843; border-color: #8b6914; }
+  .controls {
+    background: #12121a; border-bottom: 1px solid #2a2520;
+    padding: 10px 24px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+    position: sticky; top: 0; z-index: 10;
+  }
+  input[type=text] {
+    flex: 1; min-width: 200px; padding: 7px 14px;
+    background: #1c1c28; border: 1px solid #3a3028; border-radius: 4px;
+    color: #d4c9a8; font-size: 0.88rem; outline: none;
+  }
+  input[type=text]:focus { border-color: #8b6914; }
+  input[type=text]::placeholder { color: #5a5040; }
+  .act-btns { display: flex; gap: 5px; flex-wrap: wrap; }
+  .act-btn {
+    padding: 5px 13px; border-radius: 4px; border: 1px solid #3a3028;
+    background: #1c1c28; color: #8a7a5a; cursor: pointer; font-size: 0.8rem; transition: all 0.15s;
+  }
+  .act-btn:hover { border-color: #8b6914; color: #d4a843; }
+  .act-btn.active { background: #3d2200; border-color: #8b6914; color: #d4a843; }
+  .stats { font-size: 0.78rem; color: #5a5040; margin-left: auto; white-space: nowrap; }
+  .col-headers {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: #2a2520; padding: 0 24px;
+  }
+  .col-headers div {
+    background: #1a1520; padding: 7px 12px;
+    font-size: 0.72rem; color: #8b6914; text-transform: uppercase; letter-spacing: 1px;
+  }
+  #list { padding: 0 24px 60px; }
+  .entry {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 1px; background: #2a2520; margin-top: 1px; overflow: hidden;
+  }
+  .entry:hover { background: #3a3020; }
+  .entry.act-1 { --ac: #4a7a4a; }
+  .entry.act-2 { --ac: #4a6a8a; }
+  .entry.act-3 { --ac: #7a4a7a; }
+  .entry.act-4 { --ac: #8a6a2a; }
+  .entry.act-5 { --ac: #8a2a2a; }
+  .cell { background: #16161e; padding: 9px 13px; font-size: 0.84rem; line-height: 1.65; }
+  .cell-en { border-left: 3px solid var(--ac, #3a3028); color: #9a8a6a; }
+  .cell-ko { color: #d4c9a8; }
+  .act-badge {
+    display: inline-block; padding: 1px 5px; border-radius: 2px;
+    font-size: 0.66rem; font-weight: bold; margin-bottom: 4px;
+    background: var(--ac, #3a3028); color: #fff; opacity: 0.85;
+  }
+  .tag-hl { color: #5a9a7a; font-size: 0.82em; }
+  mark { background: #5a3a00; color: #ffcc66; border-radius: 2px; padding: 0 1px; }
+  .loading {
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 80px; gap: 16px; color: #8b6914;
+  }
+  .spinner {
+    width: 36px; height: 36px; border: 3px solid #3a2200;
+    border-top-color: #8b6914; border-radius: 50%; animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .no-results { text-align: center; padding: 60px; color: #5a5040; }
+  footer {
+    text-align: center; padding: 20px; font-size: 0.75rem; color: #3a3020;
+    border-top: 1px solid #1a1a20;
+  }
+  footer a { color: #5a4a20; text-decoration: none; }
+  footer a:hover { color: #8b6914; }
+</style>
+</head>
+<body>
+<header>
+  <div class="skull">💀</div>
+  <div>
+    <h1>Warhammer 40,000: Rogue Trader — 한국어 번역 뷰어</h1>
+    <div class="subtitle" id="subtitle">데이터 로딩 중...</div>
+  </div>
+  <div class="links">
+    <a href="https://github.com/bicos/RogueTrader-KoreanPatch" target="_blank">GitHub</a>
+    <a href="https://github.com/bicos/RogueTrader-KoreanPatch/releases" target="_blank">패치 다운로드</a>
+  </div>
+</header>
+<div class="controls">
+  <input type="text" id="search" placeholder="텍스트 검색 (영어 또는 한국어)..." oninput="onSearch()" disabled>
+  <div class="act-btns">
+    <button class="act-btn active" onclick="setAct(0,this)">전체</button>
+    <button class="act-btn" onclick="setAct(1,this)">1장</button>
+    <button class="act-btn" onclick="setAct(2,this)">2장</button>
+    <button class="act-btn" onclick="setAct(3,this)">3장</button>
+    <button class="act-btn" onclick="setAct(4,this)">4장</button>
+    <button class="act-btn" onclick="setAct(5,this)">5장</button>
+  </div>
+  <div class="stats" id="stats"></div>
+</div>
+<div class="col-headers">
+  <div>🔤 원문 (English)</div>
+  <div>🇰🇷 번역 (한국어)</div>
+</div>
+<div id="list"><div class="loading"><div class="spinner"></div><div>번역 데이터 로딩 중…</div></div></div>
+<footer>
+  <a href="https://github.com/bicos/RogueTrader-KoreanPatch" target="_blank">RogueTrader-KoreanPatch</a>
+  &nbsp;·&nbsp; AI 번역 + 커뮤니티 검수 &nbsp;·&nbsp; 번역 오류는 GitHub Issues로 제보해주세요
+</footer>
+<script>
+let DATA=[],filtered=[],currentAct=0,searchQ='',renderOffset=0;
+const PAGE=80,ACT=['','1장','2장','3장','4장','5장'];
+function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function tagHl(t){return esc(t).replace(/(\{[^}]*\})/g,'<span class="tag-hl">$1</span>').replace(/(&lt;[^&]*&gt;)/g,'<span class="tag-hl">$1</span>');}
+function hl(t,q){const b=tagHl(t);if(!q)return b;const re=new RegExp('('+q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi');return b.replace(re,'<mark>$1</mark>');}
+function makeRow(e){return `<div class="entry act-${e.a}"><div class="cell cell-en"><span class="act-badge">${ACT[e.a]}</span> ${hl(e.e,searchQ)}</div><div class="cell cell-ko">${hl(e.k,searchQ)}</div></div>`;}
+function doFilter(){const q=searchQ.toLowerCase();filtered=DATA.filter(e=>{if(currentAct&&e.a!==currentAct)return false;if(q&&!e.e.toLowerCase().includes(q)&&!e.k.toLowerCase().includes(q))return false;return true;});}
+function render(append=false){
+  const list=document.getElementById('list');
+  if(!append){
+    if(!filtered.length){list.innerHTML='<div class="no-results">검색 결과가 없습니다.</div>';document.getElementById('stats').textContent='0개';return;}
+    document.getElementById('stats').textContent=filtered.length.toLocaleString()+'개';
+    list.innerHTML=filtered.slice(0,PAGE).map(makeRow).join('');renderOffset=PAGE;
+  } else {
+    list.insertAdjacentHTML('beforeend',filtered.slice(renderOffset,renderOffset+PAGE).map(makeRow).join(''));renderOffset+=PAGE;
+  }
+}
+function setAct(act,btn){currentAct=act;document.querySelectorAll('.act-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderOffset=0;doFilter();render();}
+function onSearch(){searchQ=document.getElementById('search').value;renderOffset=0;doFilter();render();}
+window.addEventListener('scroll',()=>{if(window.innerHeight+window.scrollY>=document.body.offsetHeight-500&&renderOffset<filtered.length)render(true);});
+fetch('translations.json').then(r=>r.json()).then(data=>{
+  DATA=data;
+  document.getElementById('subtitle').textContent=`AI 번역 ${data.length.toLocaleString()}개 항목 · 원문(영어) / 번역(한국어) 비교`;
+  document.getElementById('search').disabled=false;
+  doFilter();render();
+}).catch(err=>{document.getElementById('list').innerHTML='<div class="no-results">데이터 로드 실패: '+err+'</div>';});
+</script>
+</body>
+</html>
