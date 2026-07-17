@@ -3,7 +3,7 @@
 ## ⚔️ 한글화 & 폰트 패치
 ✍️ 번역자 & 제작자: **군고그마**<br>
 🧪 이 패치는 영문 번역 파일(`enGB.json`)을 최신 한국어 버전으로 자동 교체해 주며, 1.5 버전부터의 폰트를 지원합니다.<br>
-📅 업데이트: 26.07.04.
+📅 업데이트: 26.07.16.
 
 ---
 
@@ -46,8 +46,7 @@ C:\Users%USERNAME%\AppData\LocalLow\Owlcat Games\Warhammer 40000 Rogue Trader\Un
 
 ## ⚠️ 주의 사항
 - 이 모드는 게임 폴더의 `StreamingAssets/Localization/enGB.json` 파일을 덮어씁니다.
-- 기존 `enGB.json` 파일은 백업해 두는 것을 권장합니다.
-- 폰트 모드의 경우 Windows 보안 경고가 발생할 수 있으나, VirusTotal 검사 결과 72개 엔진 중 71개에서 정상으로 판정되었습니다. (Cynet 오탐 1건).  
+- 기존 `enGB.json` 파일은 백업해 두는 것을 권장합니다. 
 
 ---
 
@@ -85,10 +84,8 @@ C:\Users%USERNAME%\AppData\LocalLow\Owlcat Games\Warhammer 40000 Rogue Trader\Un
 - **무한의 박물관(DLC3)**
   1. 주인공 개인실
   2. 3막
-  3. 에오군 함교 대화
-  4. 에오군-파스칼 논쟁
-  5. 에오군 첫만남
-  6. 에오군 실험(진행중)
+  3. 에오군 함교 대화 및 개인 스토리
+  4. 자르코프(진행중)
 
 ---
 
